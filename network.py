@@ -22,7 +22,7 @@ class Network(tf.keras.Model):
         return output
 
     def sepConvMobileNet(self, features, kernel_size, out_filters, stride, _name, dilationFactor=1, pad='SAME'):
-        with tf.variable_scope(_name):
+        with tf.compat.v1.variable_scope(_name):
             output = tf.keras.layers.SeparableConv2D(
                 filters=out_filters,
                 kernel_size=kernel_size,
@@ -48,7 +48,7 @@ class Network(tf.keras.Model):
             return output
 
     def spp(self, input):
-        with tf.variable_scope("spp"):
+        with tf.compat.v1.variable_scope("spp"):
             prymid1 = self.sepConvMobileNet(input, 3, 24, 1, "p1", pad='SAME')
             prymid2 = self.sepConvMobileNet(input, 3, 24, 1, "p2", pad='SAME')
             prymid3 = self.sepConvMobileNet(input, 3, 24, 1, "p3", pad='SAME')
@@ -72,13 +72,13 @@ class Network(tf.keras.Model):
         pooling = self.conv2d(conv1, 12, 1, 1, 'pooling')
 
         spp_merg = self.conv2d(spp, 48, 1, 1, 'spp-merg')
-        o1 = tf.image.resize_bilinear(spp_merg, [120, 160])
+        o1 = tf.compat.v1.image.resize_bilinear(spp_merg, [120, 160])
 
         concat = tf.concat([o1, pooling], 3, name="concat")
 
         o2 = self.sepConvMobileNet(concat, 3, NUMBER_OF_CLASSES, 1, "o2", 1)
 
-        out = tf.image.resize_bilinear(o2, [OUTPUT_HEIGHT, OUTPUT_WIDTH])
+        out = tf.compat.v1.image.resize_bilinear(o2, [OUTPUT_HEIGHT, OUTPUT_WIDTH])
 
         return out
 
