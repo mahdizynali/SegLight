@@ -179,7 +179,7 @@ from config import *
 tf.executing_eagerly()
 
 showSample = False
-tfRAddress = './'
+tfRAddress = './dataset'
 
 
 def _bytes_feature(value):
@@ -216,11 +216,11 @@ for i, address in enumerate(glob.glob(IMAGES_PATH + '*.png'), start=1):
         image = cv2.imread(address)
         label = cv2.imread("dataset/labels/" + address.split('/')[-1].split('.')[0] + '.png')
 
-        cv2.imshow("img", image)
-        cv2.imshow("label", label)
-        if cv2.waitKey(0) == ord('q'):
-            break
-        
+        # cv2.imshow("img", image)
+        # cv2.imshow("label", label)
+        # if cv2.waitKey(0) == ord('q'):
+        #     break
+
         image_string = cv2.imencode('.png', image)[1].tostring()
         label_string = cv2.imencode('.png', label)[1].tostring()
         tf_example = image_example(image_string, label_string)
