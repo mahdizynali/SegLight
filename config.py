@@ -2,6 +2,9 @@ import numpy as np
 import tensorflow as tf
 import json
 
+IMAGES_PATH = "/home/mahdi/Desktop/hslSegment/SegLight/dataset/images"
+LABELS_PATH = "/home/mahdi/Desktop/hslSegment/SegLight/dataset/labels"
+
 # Input dimensions
 INPUT_WIDTH = 320
 INPUT_HEIGHT = 240
