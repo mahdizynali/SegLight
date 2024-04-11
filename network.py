@@ -1,12 +1,5 @@
+from config import *
 import tensorflow as tf
-import config as cfg
-
-input_width = cfg.INPUT_WIDTH
-input_height = cfg.INPUT_HEIGHT
-output_width = cfg.OUTPUT_WIDTH
-output_height = cfg.OUTPUT_HEIGHT
-palette = cfg.color_palette
-num_classes = len(palette)
 
 class Network(tf.keras.Model):
     def __init__(self):
@@ -83,15 +76,15 @@ class Network(tf.keras.Model):
 
         concat = tf.concat([o1, pooling], 3, name="concat")
 
-        o2 = self.sepConvMobileNet(concat, 3, num_classes, 1, "o2", 1)
+        o2 = self.sepConvMobileNet(concat, 3, NUMBER_OF_CLASSES, 1, "o2", 1)
 
-        out = tf.image.resize_bilinear(o2, [output_height, output_width])
+        out = tf.image.resize_bilinear(o2, [OUTPUT_HEIGHT, OUTPUT_WIDTH])
 
         return out
 
 if __name__ == '__main__':
     net = Network()
-    dummy_input = tf.zeros((1, input_height, input_width, 3))
+    dummy_input = tf.zeros((1, INPUT_HEIGHT, INPUT_WIDTH, 3))
     model = net.model(dummy_input)
     model = tf.identity(model, name="model")
     
