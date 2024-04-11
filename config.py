@@ -12,6 +12,7 @@ OUTPUT_HEIGHT = 240
 
 NUMBER_OF_CLASSES = 4
 
+# read datasheet
 with open("/home/mahdi/Desktop/hslSegment/SegLight/dataset/label_classes.json", "r") as js:
     file = json.load(js)
     js.close()
