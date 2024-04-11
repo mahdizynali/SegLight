@@ -2,11 +2,14 @@ from config import *
 from network import Network
 from data_provider import getData
 
-net = Network()
-model = net.model(tf.zeros((1, INPUT_HEIGHT, INPUT_WIDTH, 3)))
-model = tf.identity(model, name="maze-model")
+# net = Network()
+# model = net.model(tf.zeros((1, INPUT_HEIGHT, INPUT_WIDTH, 3)))
+# model = tf.identity(model, name="maze-model")
 
-loss_function = SparseCategoricalCrossentropy(from_logits=True)
+model = Network()
+# model = net.call(tf.zeros((1, INPUT_HEIGHT, INPUT_WIDTH, 3)))
+
+loss_function = SparseCategoricalCrossentropy(from_logits=False)
 optimizer = Adam(learning_rate=LEARNING_RATE)
 mean_iou = MeanIoU(num_classes=NUMBER_OF_CLASSES)
 mean_loss = Mean()
@@ -35,7 +38,7 @@ def train_one_epoch(data):
     for images, labels in data:
         with tf.GradientTape() as tape:
 
-            predictions = model(images, training=True)
+            predictions = model.call(images)
             
             # Compute loss
             loss = loss_function(labels, predictions)
