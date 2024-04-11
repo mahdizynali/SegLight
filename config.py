@@ -2,6 +2,7 @@ import os
 import cv2
 import json
 import glob
+import random
 import numpy as np
 import tensorflow as tf
 
@@ -19,25 +20,19 @@ OUTPUT_WIDTH = 384
 OUTPUT_HEIGHT = 240
 
 NUMBER_OF_CLASSES = 4
-
-TRAIN_SIZE = 478  # photos
-TEST_SIZE = 80  # photos
+BATCH_SIZE = 32
 
 # read datasheet
 with open(BASE_DIR + "/dataset/label_classes.json", "r") as js:
     file = json.load(js)
     js.close()
 
+# import color map
 COLOR_MAP = {}
-for item in file :
-    if item["name"] == "field" :
-        COLOR_MAP["filed"] = item["png_index"]
-    elif item["name"] == "line" :
-        COLOR_MAP["line"] = item["png_index"]
-    elif item["name"] == "ball" :
-        COLOR_MAP["ball"] = item["png_index"]
-    elif item["name"] == "background" :
-        COLOR_MAP["background"] = item["png_index"]
+for item in file:
+    name = item["name"]
+    color = item["png_index"]
+    COLOR_MAP[name] = color
 
 # COLOR_MAP = {
 #     'background': [np.array([0.0, 0.0, 0.0], dtype=np.float32),],
