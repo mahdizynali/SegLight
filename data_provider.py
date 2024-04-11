@@ -14,6 +14,22 @@ def convert_rgb_to_class(rgb_label):
         int_label = tf.where(mask, class_idx, int_label)
     return int_label
 
+def _one_hot_encode(x: tf.Tensor, y: tf.Tensor) -> tf.Tensor:
+
+    one_hot_map = []
+    for class_name in COLOR_MAP:
+        eq_list = []
+        for color in COLOR_MAP[class_name]:
+            eq = tf.equal(y, color)
+            rd = tf.reduce_all(eq, axis=-1)
+            eq_list.append(rd)
+        orl = tf.reduce_any(eq_list, axis=0)
+        # eq = tf.equal(y, palette[class_name])
+        class_map = tf.cast(orl, tf.float32)
+        one_hot_map.append(class_map)
+    one_hot_map = tf.stack(one_hot_map, axis=-1)
+    y = tf.cast(one_hot_map, tf.float32)
+    return x, y
 
 def load_and_preprocess_data(image_path, label_path):
 
@@ -33,11 +49,13 @@ def load_and_preprocess_data(image_path, label_path):
 
     label = convert_rgb_to_class(label)
     
-    label = tf.one_hot(label, depth=NUMBER_OF_CLASSES)
+    # label = tf.one_hot(label, depth=NUMBER_OF_CLASSES)
+    # image = tf.one_hot(image, depth=NUMBER_OF_CLASSES)
+    image, label = _one_hot_encode(image, label)
 
     # label = tf.reshape(label, (BATCH_SIZE, INPUT_HEIGHT, INPUT_WIDTH, NUMBER_OF_CLASSES))
-    # print("Image shape:", image.shape)
-    # print("Label shape:", label.shape)
+    print("Image shape:", image.shape)
+    print("Label shape:", label.shape)
 
     return image, label
 
@@ -98,6 +116,5 @@ def getData():
     test_dataset = test_dataset.map(load_and_preprocess_data, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     test_dataset = test_dataset.batch(BATCH_SIZE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
+    # display_something(train_dataset)
     return train_dataset, test_dataset
-
-# display_something(train_dataset)
