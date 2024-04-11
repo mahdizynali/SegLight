@@ -35,9 +35,9 @@ def load_and_preprocess_data(image_path, label_path):
     
     label = tf.one_hot(label, depth=NUMBER_OF_CLASSES)
 
-    label = tf.reshape(label, (BATCH_SIZE, INPUT_HEIGHT, INPUT_WIDTH, NUMBER_OF_CLASSES))
-    print("Image shape:", image.shape)
-    print("Label shape:", label.shape)
+    # label = tf.reshape(label, (BATCH_SIZE, INPUT_HEIGHT, INPUT_WIDTH, NUMBER_OF_CLASSES))
+    # print("Image shape:", image.shape)
+    # print("Label shape:", label.shape)
 
     return image, label
 
