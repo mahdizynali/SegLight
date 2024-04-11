@@ -8,32 +8,62 @@ from config import *
 # input_width = cfg.INPUT_WIDTH
 # input_height = cfg.INPUT_HEIGHT
 
+tf.executing_eagerly()
 
-# def _bytes_feature(value):
-#     """Returns a bytes_list from a string / byte."""
-#     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
+tfRAddress = './dataset/'
 
-
-# def _float_feature(value):
-#     """Returns a float_list from a float / double."""
-#     return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
+writerTrain = tf.io.TFRecordWriter(tfRAddress + 'train.tfrecords')
+writerTest = tf.io.TFRecordWriter(tfRAddress + 'test.tfrecords')
 
 
-# def _int64_feature(value):
-#     """Returns an int64_list from a bool / enum / int / uint."""
-#     return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
+def _bytes_feature(value):
+    """Returns a bytes_list from a string / byte."""
+    return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
 
-# def image_example(image_string, label_string):
-#     image_shape = tf.image.decode_png(image_string).shape
-#     feature = {
-#         'height': _int64_feature(image_shape[0]),
-#         'width': _int64_feature(image_shape[1]),
-#         'depth': _int64_feature(image_shape[2]),
-#         'image': _bytes_feature(image_string),
-#         'label': _bytes_feature(label_string)
-#     }
-#     return tf.train.Example(features=tf.train.Features(feature=feature))
+def _float_feature(value):
+    """Returns a float_list from a float / double."""
+    return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
+
+
+def _int64_feature(value):
+    """Returns an int64_list from a bool / enum / int / uint."""
+    return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
+
+
+def image_example(image_string, label_string):
+    image_shape = tf.image.decode_png(image_string).shape
+    feature = {
+        'height': _int64_feature(image_shape[0]),
+        'width': _int64_feature(image_shape[1]),
+        'depth': _int64_feature(image_shape[2]),
+        'image': _bytes_feature(image_string),
+        'label': _bytes_feature(label_string)
+    }
+    return tf.train.Example(features=tf.train.Features(feature=feature))
+
+
+for i, address in enumerate(glob.glob(IMAGES_PATH + '*.png'), start=1):
+    if len(address.split('_')) == 1:
+        image = cv2.imread(address)
+        label = cv2.imread(LABELS_PATH + address.split('/')[-1].split('.')[0] + '.png')
+
+        # cv2.imshow("img", image)
+        # cv2.imshow("label", label)
+        # if cv2.waitKey(0) == ord('q'):
+        #     break
+
+        image_string = cv2.imencode('.png', image)[1].tostring()
+        label_string = cv2.imencode('.png', label)[1].tostring()
+        tf_example = image_example(image_string, label_string)
+        if i <= TEST_SIZE:
+            writerTest.write(tf_example.SerializeToString())
+        else:
+            writerTrain.write(tf_example.SerializeToString())
+
+writerTrain.close()
+writerTest.close()
+
 
 
 # def _parse_image_function(example_proto):
@@ -176,58 +206,3 @@ from config import *
 
 
 
-tf.executing_eagerly()
-
-showSample = False
-tfRAddress = './dataset'
-
-
-def _bytes_feature(value):
-    """Returns a bytes_list from a string / byte."""
-    return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
-
-
-def _float_feature(value):
-    """Returns a float_list from a float / double."""
-    return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
-
-
-def _int64_feature(value):
-    """Returns an int64_list from a bool / enum / int / uint."""
-    return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
-
-
-def image_example(image_string, label_string):
-    image_shape = tf.image.decode_png(image_string).shape
-    feature = {
-        'height': _int64_feature(image_shape[0]),
-        'width': _int64_feature(image_shape[1]),
-        'depth': _int64_feature(image_shape[2]),
-        'image': _bytes_feature(image_string),
-        'label': _bytes_feature(label_string)
-    }
-    return tf.train.Example(features=tf.train.Features(feature=feature))
-
-writerTrain = tf.io.TFRecordWriter(tfRAddress + 'train.tfrecords')
-writerTest = tf.io.TFRecordWriter(tfRAddress + 'test.tfrecords')
-
-for i, address in enumerate(glob.glob(IMAGES_PATH + '*.png'), start=1):
-    if len(address.split('_')) == 1:
-        image = cv2.imread(address)
-        label = cv2.imread("dataset/labels/" + address.split('/')[-1].split('.')[0] + '.png')
-
-        # cv2.imshow("img", image)
-        # cv2.imshow("label", label)
-        # if cv2.waitKey(0) == ord('q'):
-        #     break
-
-        image_string = cv2.imencode('.png', image)[1].tostring()
-        label_string = cv2.imencode('.png', label)[1].tostring()
-        tf_example = image_example(image_string, label_string)
-        if i <= TEST_SIZE:
-            writerTest.write(tf_example.SerializeToString())
-        else:
-            writerTrain.write(tf_example.SerializeToString())
-
-writerTrain.close()
-writerTest.close()
