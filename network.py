@@ -58,6 +58,7 @@ class Network(tf.keras.Model):
             return sppConcat
 
     def model(self, input):
+        
         conv1 = self.conv2d(input, 6, 3, 2, 'conv1')
 
         conv2 = self.sepConvMobileNet(conv1, 3, 12, 1, "conv2")
@@ -78,5 +79,5 @@ class Network(tf.keras.Model):
         o2 = self.sepConvMobileNet(concat, 3, NUMBER_OF_CLASSES, 1, "o2", 1)
 
         out = tf.image.resize(o2, [OUTPUT_HEIGHT, OUTPUT_WIDTH],method=tf.image.ResizeMethod.BILINEAR)
-
+        
         return out
