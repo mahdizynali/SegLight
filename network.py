@@ -1,12 +1,11 @@
 from config import *
-import tensorflow as tf
 
 class Network(tf.keras.Model):
     def __init__(self):
         super(Network, self).__init__()
 
         self.activation = tf.nn.leaky_relu
-        self.weightInitializer = tf.initializers.GlorotUniform()
+        self.weightInitializer = tf.keras.initializers.GlorotUniform(seed=42)
         self.normalizer_fn = None
 
     def conv2d(self, input, nFilters, kernelSize, _strides, _name):
@@ -72,29 +71,12 @@ class Network(tf.keras.Model):
         pooling = self.conv2d(conv1, 12, 1, 1, 'pooling')
 
         spp_merg = self.conv2d(spp, 48, 1, 1, 'spp-merg')
-        o1 = tf.compat.v1.image.resize_bilinear(spp_merg, [120, 160])
+        o1 = tf.image.resize(spp_merg, [120, 160], method=tf.image.ResizeMethod.BILINEAR)
 
         concat = tf.concat([o1, pooling], 3, name="concat")
 
         o2 = self.sepConvMobileNet(concat, 3, NUMBER_OF_CLASSES, 1, "o2", 1)
 
-        out = tf.compat.v1.image.resize_bilinear(o2, [OUTPUT_HEIGHT, OUTPUT_WIDTH])
+        out = tf.image.resize(o2, [OUTPUT_HEIGHT, OUTPUT_WIDTH],method=tf.image.ResizeMethod.BILINEAR)
 
         return out
-
-if __name__ == '__main__':
-    net = Network()
-    dummy_input = tf.zeros((1, INPUT_HEIGHT, INPUT_WIDTH, 3))
-    model = net.model(dummy_input)
-    model = tf.identity(model, name="model")
-    
-    writer = tf.summary.create_file_writer('logs/graphs')
-    writer.set_as_default()
-    tf.summary.trace_on(graph=True, profiler=True)
-
-    with writer.as_default():
-        tf.summary.trace_export(
-            name="model_trace",
-            step=0,
-            profiler_outdir='logs/graphs'
-        )
