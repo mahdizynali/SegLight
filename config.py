@@ -1,9 +1,12 @@
 import numpy as np
 import tensorflow as tf
 import json
+import os
 
-IMAGES_PATH = "/home/mahdi/Desktop/hslSegment/SegLight/dataset/images"
-LABELS_PATH = "/home/mahdi/Desktop/hslSegment/SegLight/dataset/labels"
+BASE_DIR = os.path.dirname(__file__)
+
+IMAGES_PATH = BASE_DIR + "/dataset/images"
+LABELS_PATH = BASE_DIR + "/dataset/labels"
 
 # Input dimensions
 INPUT_WIDTH = 320
@@ -16,7 +19,7 @@ OUTPUT_HEIGHT = 240
 NUMBER_OF_CLASSES = 4
 
 # read datasheet
-with open("/home/mahdi/Desktop/hslSegment/SegLight/dataset/label_classes.json", "r") as js:
+with open(BASE_DIR + "/dataset/label_classes.json", "r") as js:
     file = json.load(js)
     js.close()
 
