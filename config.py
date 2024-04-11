@@ -1,12 +1,14 @@
+import os
+import cv2
+import json
+import glob
 import numpy as np
 import tensorflow as tf
-import json
-import os
 
 BASE_DIR = os.path.dirname(__file__)
 
-IMAGES_PATH = BASE_DIR + "/dataset/images"
-LABELS_PATH = BASE_DIR + "/dataset/labels"
+IMAGES_PATH = BASE_DIR + "/dataset/images/"
+LABELS_PATH = BASE_DIR + "/dataset/labels/"
 
 # Input dimensions
 INPUT_WIDTH = 320
@@ -17,6 +19,9 @@ OUTPUT_WIDTH = 384
 OUTPUT_HEIGHT = 240
 
 NUMBER_OF_CLASSES = 4
+
+TRAIN_SIZE = 478  # photos
+TEST_SIZE = 80  # photos
 
 # read datasheet
 with open(BASE_DIR + "/dataset/label_classes.json", "r") as js:

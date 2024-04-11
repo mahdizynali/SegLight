@@ -1,6 +1,6 @@
-import tensorflow as tf
 from config import *
 from network import Network
+import data_provider
 
 if __name__ == '__main__':
     net = Network()
