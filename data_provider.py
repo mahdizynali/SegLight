@@ -2,14 +2,11 @@ from config import *
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
-# Set image and label paths
 image_paths = glob.glob(IMAGES_PATH + '*.png')
 label_paths = [LABELS_PATH + path.split('/')[-1].split('.')[0] + '.png' for path in image_paths]
 
-# Define image size
 IMAGE_SIZE = (INPUT_HEIGHT, INPUT_WIDTH)
 
-# Function to convert RGB labels to class indices
 def convert_rgb_to_class(rgb_label):
     int_label = tf.zeros((rgb_label.shape[0], rgb_label.shape[1]), dtype=tf.int32)
     for class_name, color in COLOR_MAP.items():
@@ -42,7 +39,6 @@ def load_and_preprocess_data(image_path, label_path):
     return image, label
 
 
-# Function to perform data augmentation
 def data_augmentation(image, label):
     image = tf.image.random_flip_left_right(image)
     image = tf.image.random_flip_up_down(image)
@@ -54,24 +50,18 @@ def data_augmentation(image, label):
     image = tf.image.random_contrast(image, lower=0.7, upper=1.3)
     return image, label
 
-# Split the data into training and testing sets (85/15 ratio)
 train_image_paths, test_image_paths, train_label_paths, test_label_paths = train_test_split(
     image_paths, label_paths, test_size=0.15, random_state=42
 )
 
-# Create training dataset
 train_dataset = tf.data.Dataset.from_tensor_slices((train_image_paths, train_label_paths))
 train_dataset = train_dataset.map(load_and_preprocess_data, num_parallel_calls=tf.data.experimental.AUTOTUNE)
 train_dataset = train_dataset.map(data_augmentation, num_parallel_calls=tf.data.experimental.AUTOTUNE)
 train_dataset = train_dataset.shuffle(buffer_size=100).batch(BATCH_SIZE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
-# Create testing dataset
 test_dataset = tf.data.Dataset.from_tensor_slices((test_image_paths, test_label_paths))
 test_dataset = test_dataset.map(load_and_preprocess_data, num_parallel_calls=tf.data.experimental.AUTOTUNE)
 test_dataset = test_dataset.batch(BATCH_SIZE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-
-
-
 
 
 color_lookup_bgr = np.zeros((len(COLOR_MAP), 3), dtype=np.uint8)
@@ -80,7 +70,7 @@ for idx, (class_name, color) in enumerate(COLOR_MAP.items()):
     color_bgr = [color[2], color[1], color[0]]
     color_lookup_bgr[idx] = np.array(color_bgr, dtype=np.uint8)
 
-def inspect_dataset(dataset, num_samples=20):
+def display_something(dataset, num_samples=5):
     """Inspect a few samples from the dataset to ensure they are correct."""
     for i, (image, label) in enumerate(dataset.take(num_samples)):
 
@@ -104,4 +94,4 @@ def inspect_dataset(dataset, num_samples=20):
         
         cv2.destroyAllWindows()
 
-# inspect_dataset(train_dataset)
+# display_something(train_dataset)
