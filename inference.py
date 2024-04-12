@@ -74,3 +74,8 @@ def real_time_inference(model):
 
     cap.release()
     cv2.destroyAllWindows()
+    
+
+def load_model(path):
+    model = tf.keras.models.load_model(path)
+    return model

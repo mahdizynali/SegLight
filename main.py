@@ -104,5 +104,7 @@ if __name__ == '__main__':
     model.save("./model", save_format='tf')
     print("\nNew Model has been save !\n")
 
-    # inference_on_image(model, test_set, num_samples=5)
-    real_time_inference(model)
+    loaded_model = tf.keras.models.load_model("./model")
+
+    # inference_on_image(loaded_model, test_set, num_samples=5)
+    real_time_inference(loaded_model)
