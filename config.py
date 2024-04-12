@@ -6,6 +6,7 @@ import random
 import numpy as np
 from tqdm import tqdm
 import tensorflow as tf
+from tensorflow.keras import layers
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import MeanIoU, Mean
 from tensorflow.keras.losses import SparseCategoricalCrossentropy, CategoricalCrossentropy
@@ -25,7 +26,7 @@ OUTPUT_HEIGHT = 240
 
 NUMBER_OF_CLASSES = 4
 BATCH_SIZE = 64
-EPOCH_NUMBER = 100
+EPOCH_NUMBER = 10
 LEARNING_RATE = 0.001
 
 # read datasheet

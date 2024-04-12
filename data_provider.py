@@ -81,8 +81,8 @@ def display_something(dataset, num_samples=5):
     """Inspect a few samples from the dataset to ensure they are correct."""
     for i, (image, label) in enumerate(dataset.take(num_samples)):
 
-        image_np = image[0].numpy()
-        label_np = label[0].numpy()
+        image_np = image[1].numpy()
+        label_np = label[1].numpy()
         
 
         if label_np.ndim > 2:
@@ -118,7 +118,5 @@ def getData():
     test_dataset = test_dataset.batch(BATCH_SIZE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
     test_dataset = test_dataset.repeat(2)
 
-    display_something(train_dataset)
+    # display_something(train_dataset)
     return train_dataset, test_dataset
-
-# getData()

@@ -1,17 +1,11 @@
 from config import *
-from network import Network
+from network import MazeNet
 from data_provider import getData
 
-# net = Network()
-# model = net.model(tf.zeros((1, INPUT_HEIGHT, INPUT_WIDTH, 3)))
-# model = tf.identity(model, name="maze-model")
-
-model = Network()
-# model = net.call(tf.zeros((1, INPUT_HEIGHT, INPUT_WIDTH, 3)))
-
+model = MazeNet()
 
 def dice_loss(y_true, y_pred):
-    smooth = 1e-6  # Small value to avoid division by zero
+    smooth = 1e-6
     y_true_f = tf.keras.backend.flatten(y_true)
     y_pred_f = tf.keras.backend.flatten(y_pred)
     intersection = tf.reduce_sum(y_true_f * y_pred_f)
@@ -75,7 +69,6 @@ def evaluate_one_epoch(data):
     mean_iou.reset_states()
 
     pbar = tqdm(data, desc="Evaluation", unit="batch")
-
     for images, labels in pbar:
 
         predictions = model(images)
@@ -92,20 +85,63 @@ def evaluate_one_epoch(data):
     return mean_loss.result(), mean_iou.result()
 
 
+def display_predictions_opencv(model, test_dataset, num_samples=5):
+    """Display predictions on some test samples using OpenCV."""
+    for i, (image, label) in enumerate(test_dataset.take(num_samples)):
+        # Perform prediction using the trained model
+        prediction = model(image)
+        
+        # Convert prediction and label tensors to numpy arrays
+        prediction_np = prediction.numpy()
+        label_np = label.numpy()
+        
+        # Get the predicted classes using argmax (assuming one-hot encoding)
+        predicted_classes = np.argmax(prediction_np, axis=-1)
+        true_classes = np.argmax(label_np, axis=-1)
+        
+        # Convert image from TensorFlow tensor to numpy array and scale it
+        image_np = (image[0].numpy() * 255).astype(np.uint8)
+        
+        # Create color lookup table for labels
+        color_lookup_bgr = np.zeros((len(COLOR_MAP), 3), dtype=np.uint8)
+        for idx, (class_name, color) in enumerate(COLOR_MAP.items()):
+            color_bgr = [color[2], color[1], color[0]]
+            color_lookup_bgr[idx] = np.array(color_bgr, dtype=np.uint8)
+        
+        # Color the true and predicted classes using the color lookup table
+        true_colored = color_lookup_bgr[true_classes[0]]
+        predicted_colored = color_lookup_bgr[predicted_classes[0]]
+        
+        # Display the images using OpenCV
+        cv2.imshow(f'Original Image {i + 1}', cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR))
+        cv2.imshow(f'True Label {i + 1}', true_colored)
+        cv2.imshow(f'Predicted Label {i + 1}', predicted_colored)
+        
+        # Wait for a key press to move to the next sample
+        cv2.waitKey(0)
+        
+        # Close all OpenCV windows
+        cv2.destroyAllWindows()
+
+def save_model(model, path):
+    print("here \n\n")
+    os.makedirs(path, exist_ok=True)
+
+    tf.saved_model.save(model, path)
 
 if __name__ == '__main__':
     
     train_set, test_set = getData()
 
     for epoch in range(EPOCH_NUMBER):
-        print(f'Epoch {epoch + 1}/{EPOCH_NUMBER}')
 
         train_loss, train_iou = train_one_epoch(train_set)
+        print(f'Epoch {epoch + 1}/{EPOCH_NUMBER}')
         print(f'Training loss: {train_loss:.4f}, Training mean IoU: {train_iou:.4f}')
 
         eval_loss, eval_iou = evaluate_one_epoch(test_set)
         print(f'Evaluation loss: {eval_loss:.4f}, Evaluation mean IoU: {eval_iou:.4f}')
         print("\n==================================================================\n")
 
-    model.save('my_model')
-
+    # save_model(model, "./")
+    # display_predictions_opencv(model, test_set, num_samples=5)
