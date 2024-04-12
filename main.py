@@ -88,39 +88,31 @@ def evaluate_one_epoch(data):
 def display_predictions_opencv(model, test_dataset, num_samples=5):
     """Display predictions on some test samples using OpenCV."""
     for i, (image, label) in enumerate(test_dataset.take(num_samples)):
-        # Perform prediction using the trained model
+
         prediction = model(image)
         
-        # Convert prediction and label tensors to numpy arrays
         prediction_np = prediction.numpy()
         label_np = label.numpy()
         
-        # Get the predicted classes using argmax (assuming one-hot encoding)
         predicted_classes = np.argmax(prediction_np, axis=-1)
         true_classes = np.argmax(label_np, axis=-1)
         
-        # Convert image from TensorFlow tensor to numpy array and scale it
         image_np = (image[0].numpy() * 255).astype(np.uint8)
         
-        # Create color lookup table for labels
         color_lookup_bgr = np.zeros((len(COLOR_MAP), 3), dtype=np.uint8)
         for idx, (class_name, color) in enumerate(COLOR_MAP.items()):
             color_bgr = [color[2], color[1], color[0]]
             color_lookup_bgr[idx] = np.array(color_bgr, dtype=np.uint8)
         
-        # Color the true and predicted classes using the color lookup table
         true_colored = color_lookup_bgr[true_classes[0]]
         predicted_colored = color_lookup_bgr[predicted_classes[0]]
         
-        # Display the images using OpenCV
         cv2.imshow(f'Original Image {i + 1}', cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR))
         cv2.imshow(f'True Label {i + 1}', true_colored)
         cv2.imshow(f'Predicted Label {i + 1}', predicted_colored)
         
-        # Wait for a key press to move to the next sample
         cv2.waitKey(0)
         
-        # Close all OpenCV windows
         cv2.destroyAllWindows()
 
 def save_model(model, path):
@@ -144,4 +136,4 @@ if __name__ == '__main__':
         print("\n==================================================================\n")
 
     # save_model(model, "./")
-    # display_predictions_opencv(model, test_set, num_samples=5)
+    display_predictions_opencv(model, test_set, num_samples=5)
