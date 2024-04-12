@@ -100,7 +100,7 @@ if __name__ == '__main__':
         print("\n==================================================================\n")
 
 
-        if epoch % 10 == 0:
+        if (epoch + 1) % 10 == 0:
             model.save(f"./model/epoch-{str(epoch+1)}", save_format='tf')
         print("\nNew Model has been save !\n")
 
