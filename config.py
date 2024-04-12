@@ -4,6 +4,7 @@ import json
 import glob
 import random
 import numpy as np
+from tqdm import tqdm
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import MeanIoU, Mean
@@ -23,7 +24,7 @@ OUTPUT_WIDTH = 320
 OUTPUT_HEIGHT = 240
 
 NUMBER_OF_CLASSES = 4
-BATCH_SIZE = 16
+BATCH_SIZE = 8
 EPOCH_NUMBER = 100
 LEARNING_RATE = 0.001
 

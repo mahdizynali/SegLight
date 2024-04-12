@@ -35,7 +35,9 @@ def train_one_epoch(data):
     mean_loss.reset_states()
     mean_iou.reset_states()
 
-    for images, labels in data:
+    pbar = tqdm(data, desc="Training", unit="batch")
+
+    for images, labels in pbar:
         with tf.GradientTape() as tape:
 
             predictions = model.call(images)
@@ -61,7 +63,9 @@ def evaluate_one_epoch(data):
     mean_loss.reset_states()
     mean_iou.reset_states()
 
-    for images, labels in data:
+    pbar = tqdm(data, desc="Evaluation", unit="batch")
+
+    for images, labels in pbar:
 
         predictions = model(images)
 
@@ -90,5 +94,7 @@ if __name__ == '__main__':
 
         eval_loss, eval_iou = evaluate_one_epoch(test_set)
         print(f'Evaluation loss: {eval_loss:.4f}, Evaluation mean IoU: {eval_iou:.4f}')
+        print("\n==================================================================\n")
 
     model.save('my_model')
+
