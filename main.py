@@ -11,11 +11,11 @@ def dice_loss(y_true, y_pred):
     intersection = tf.reduce_sum(y_true_f * y_pred_f)
     dice = (2.0 * intersection + smooth) / (tf.reduce_sum(y_true_f) + tf.reduce_sum(y_pred_f) + smooth)
     return 1 - dice
-
+# loss_function = dice_loss
 
 # loss_function = SparseCategoricalCrossentropy(from_logits=False)
-# loss_function = CategoricalCrossentropy(from_logits=False)
-loss_function = dice_loss
+loss_function = CategoricalCrossentropy(from_logits=False)
+
 optimizer = Adam(learning_rate=LEARNING_RATE)
 mean_iou = MeanIoU(num_classes=NUMBER_OF_CLASSES)
 mean_loss = Mean()
@@ -45,7 +45,7 @@ def train_one_epoch(data):
     for images, labels in pbar:
         with tf.GradientTape() as tape:
 
-            predictions = model.call(images)
+            predictions = model.call(images, training=True)
 
             loss = loss_function(labels, predictions)
 
@@ -85,7 +85,7 @@ def evaluate_one_epoch(data):
     return mean_loss.result(), mean_iou.result()
 
 
-def display_predictions_opencv(model, test_dataset, num_samples=5):
+def display_predictions_opencv(model, test_dataset, num_samples=20):
     """Display predictions on some test samples using OpenCV."""
     for i, (image, label) in enumerate(test_dataset.take(num_samples)):
 
@@ -97,7 +97,7 @@ def display_predictions_opencv(model, test_dataset, num_samples=5):
         predicted_classes = np.argmax(prediction_np, axis=-1)
         true_classes = np.argmax(label_np, axis=-1)
         
-        image_np = (image[0].numpy() * 255).astype(np.uint8)
+        image_np = (image[3].numpy() * 255).astype(np.uint8)
         
         color_lookup_bgr = np.zeros((len(COLOR_MAP), 3), dtype=np.uint8)
         for idx, (class_name, color) in enumerate(COLOR_MAP.items()):
@@ -115,15 +115,12 @@ def display_predictions_opencv(model, test_dataset, num_samples=5):
         
         cv2.destroyAllWindows()
 
-def save_model(model, path):
-    print("here \n\n")
-    os.makedirs(path, exist_ok=True)
-
-    tf.saved_model.save(model, path)
 
 if __name__ == '__main__':
     
     train_set, test_set = getData()
+
+    # session = tf.compat.v1.Session()
 
     for epoch in range(EPOCH_NUMBER):
 
@@ -135,5 +132,8 @@ if __name__ == '__main__':
         print(f'Evaluation loss: {eval_loss:.4f}, Evaluation mean IoU: {eval_iou:.4f}')
         print("\n==================================================================\n")
 
-    # save_model(model, "./")
+
+    # tf.saved_model.save(model, './')
+    # model.save('./', save_format='tf')
+
     display_predictions_opencv(model, test_set, num_samples=5)
