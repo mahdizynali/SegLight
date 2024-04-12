@@ -49,11 +49,13 @@ def load_and_preprocess_data(image_path, label_path):
 
     label = convert_rgb_to_class(label)
     
-    # label = tf.one_hot(label, depth=NUMBER_OF_CLASSES)
+    label = tf.one_hot(label, depth=NUMBER_OF_CLASSES)
     # image = tf.one_hot(image, depth=NUMBER_OF_CLASSES)
-    image, label = _one_hot_encode(image, label)
+    # label = tf.reshape(label, IMAGE_SIZE)
+    # image, label = _one_hot_encode(image, label)
 
     # label = tf.reshape(label, (BATCH_SIZE, INPUT_HEIGHT, INPUT_WIDTH, NUMBER_OF_CLASSES))
+    # label = tf.reshape(label, (BATCH_SIZE, 240, 320))
     print("Image shape:", image.shape)
     print("Label shape:", label.shape)
 

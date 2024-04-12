@@ -7,7 +7,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import MeanIoU, Mean
-from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from tensorflow.keras.losses import SparseCategoricalCrossentropy, CategoricalCrossentropy
 
 BASE_DIR = os.path.dirname(__file__)
 
@@ -23,7 +23,7 @@ OUTPUT_WIDTH = 320
 OUTPUT_HEIGHT = 240
 
 NUMBER_OF_CLASSES = 4
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 EPOCH_NUMBER = 100
 LEARNING_RATE = 0.001
 

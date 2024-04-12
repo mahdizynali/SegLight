@@ -9,7 +9,8 @@ from data_provider import getData
 model = Network()
 # model = net.call(tf.zeros((1, INPUT_HEIGHT, INPUT_WIDTH, 3)))
 
-loss_function = SparseCategoricalCrossentropy(from_logits=False)
+# loss_function = SparseCategoricalCrossentropy(from_logits=False)
+loss_function = CategoricalCrossentropy(from_logits=False)
 optimizer = Adam(learning_rate=LEARNING_RATE)
 mean_iou = MeanIoU(num_classes=NUMBER_OF_CLASSES)
 mean_loss = Mean()
@@ -30,51 +31,49 @@ mean_loss = Mean()
 
 
 def train_one_epoch(data):
-    # Reset metrics
+
     mean_loss.reset_states()
     mean_iou.reset_states()
 
-    # Loop through the dataset
     for images, labels in data:
         with tf.GradientTape() as tape:
 
             predictions = model.call(images)
-            
-            # Compute loss
+
             loss = loss_function(labels, predictions)
 
-        # Compute gradients
         gradients = tape.gradient(loss, model.trainable_variables)
 
-        # Update model weights
         optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
-        # Update metrics
-        mean_loss.update_state(loss)
-        mean_iou.update_state(labels, tf.argmax(predictions, axis=-1))
+        predictions_argmax = tf.argmax(predictions, axis=-1)
 
-    # Return mean loss and mean IoU
+        labels_reshaped = tf.argmax(labels, axis=-1)
+
+        mean_loss.update_state(loss)
+        mean_iou.update_state(labels_reshaped, predictions_argmax)
+
     return mean_loss.result(), mean_iou.result()
 
-# Function to evaluate one epoch
+
 def evaluate_one_epoch(data):
-    # Reset metrics
+
     mean_loss.reset_states()
     mean_iou.reset_states()
 
-    # Loop through the dataset
     for images, labels in data:
-        # Forward pass
+
         predictions = model(images)
 
-        # Compute loss
         loss = loss_function(labels, predictions)
 
-        # Update metrics
-        mean_loss.update_state(loss)
-        mean_iou.update_state(labels, tf.argmax(predictions, axis=-1))
+        predictions_argmax = tf.argmax(predictions, axis=-1)
 
-    # Return mean loss and mean IoU
+        labels_reshaped = tf.argmax(labels, axis=-1)
+
+        mean_loss.update_state(loss)
+        mean_iou.update_state(labels_reshaped, predictions_argmax)
+
     return mean_loss.result(), mean_iou.result()
 
 
