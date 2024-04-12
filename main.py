@@ -85,8 +85,8 @@ def evaluate_one_epoch(data):
     return mean_loss.result(), mean_iou.result()
 
 
-def display_predictions_opencv(model, test_dataset, num_samples=20):
-    """Display predictions on some test samples using OpenCV."""
+def display_predictions_opencv(model, test_dataset, num_samples=10):
+    
     for i, (image, label) in enumerate(test_dataset.take(num_samples)):
 
         prediction = model(image)
@@ -97,7 +97,7 @@ def display_predictions_opencv(model, test_dataset, num_samples=20):
         predicted_classes = np.argmax(prediction_np, axis=-1)
         true_classes = np.argmax(label_np, axis=-1)
         
-        image_np = (image[3].numpy() * 255).astype(np.uint8)
+        image_np = (image[0].numpy() * 255).astype(np.uint8)
         
         color_lookup_bgr = np.zeros((len(COLOR_MAP), 3), dtype=np.uint8)
         for idx, (class_name, color) in enumerate(COLOR_MAP.items()):
@@ -114,6 +114,51 @@ def display_predictions_opencv(model, test_dataset, num_samples=20):
         cv2.waitKey(0)
         
         cv2.destroyAllWindows()
+
+
+def display_webcam_predictions_opencv(model):
+
+    cap = cv2.VideoCapture(0) 
+    
+    color_lookup_bgr = np.zeros((len(COLOR_MAP), 3), dtype=np.uint8)
+    for idx, (class_name, color) in enumerate(COLOR_MAP.items()):
+
+        color_bgr = [color[2], color[1], color[0]]
+        color_lookup_bgr[idx] = np.array(color_bgr, dtype=np.uint8)
+    
+    while True:
+        ret, frame = cap.read()
+        
+        if not ret:
+            break
+        
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        frame_rgb = cv2.resize(frame_rgb, (320,240), interpolation=cv2.INTER_LINEAR)
+        
+        frame_tensor = tf.convert_to_tensor(frame_rgb, dtype=tf.float32)
+        frame_tensor = tf.expand_dims(frame_tensor, axis=0)
+        
+        frame_tensor = frame_tensor / 255.0
+        
+        prediction = model.call(frame_tensor,training=False)
+        
+        prediction_np = prediction[0]
+        
+        predicted_classes = np.argmax(prediction_np, axis=-1)
+        
+        predicted_colored = color_lookup_bgr[predicted_classes]
+        
+        predicted_colored_bgr = cv2.cvtColor(predicted_colored, cv2.COLOR_RGB2BGR)
+        
+        cv2.imshow('real', frame)
+        cv2.imshow('pred', predicted_colored_bgr)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
@@ -136,4 +181,5 @@ if __name__ == '__main__':
     # tf.saved_model.save(model, './')
     # model.save('./', save_format='tf')
 
-    display_predictions_opencv(model, test_set, num_samples=5)
+    # display_predictions_opencv(model, test_set, num_samples=5)
+    display_webcam_predictions_opencv(model)
