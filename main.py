@@ -89,8 +89,6 @@ if __name__ == '__main__':
     
     train_set, test_set = getData()
 
-    # session = tf.compat.v1.Session()
-
     for epoch in range(EPOCH_NUMBER):
 
         train_loss, train_iou = train_one_epoch(train_set)
@@ -101,10 +99,12 @@ if __name__ == '__main__':
         print(f'Evaluation loss: {eval_loss:.4f}, Evaluation mean IoU: {eval_iou:.4f}')
         print("\n==================================================================\n")
 
-    model.save("./model", save_format='tf')
-    print("\nNew Model has been save !\n")
 
-    loaded_model = tf.keras.models.load_model("./model")
+        if epoch % 10 == 0:
+            model.save(f"./model/epoch-{str(epoch+1)}", save_format='tf')
+        print("\nNew Model has been save !\n")
+
+    # loaded_model = tf.keras.models.load_model("./model")
 
     # inference_on_image(loaded_model, test_set, num_samples=5)
-    real_time_inference(loaded_model)
+    # real_time_inference(loaded_model)
