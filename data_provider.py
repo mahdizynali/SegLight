@@ -50,21 +50,19 @@ def load_and_preprocess_data(image_path, label_path):
     label = convert_rgb_to_class(label)
     
     label = tf.one_hot(label, depth=NUMBER_OF_CLASSES)
-    # image = tf.one_hot(image, depth=NUMBER_OF_CLASSES)
-    # label = tf.reshape(label, IMAGE_SIZE)
-    # image, label = _one_hot_encode(image, la~bel)
-
-    # label = tf.reshape(label, (BATCH_SIZE, INPUT_HEIGHT, INPUT_WIDTH, NUMBER_OF_CLASSES))
-    # label = tf.reshape(label, (BATCH_SIZE, 240, 320))
-    # print("Image shape:", image.shape)
-    # print("Label shape:", label.shape)
 
     return image, label
 
 
 def data_augmentation(image, label):
-    image = tf.image.random_flip_left_right(image)
-    image = tf.image.random_flip_up_down(image)
+    if tf.random.uniform([]) > 0.5:
+        image = tf.image.flip_left_right(image)
+        label = tf.image.flip_left_right(label)
+        
+    if tf.random.uniform([]) > 0.5:
+        image = tf.image.flip_up_down(image)
+        label = tf.image.flip_up_down(label)
+
     image = tf.image.random_brightness(image, 0.05)
     image = tf.image.random_contrast(image, 0.7, 1.7)
     image = tf.clip_by_value(image, 0, 255)
@@ -113,10 +111,14 @@ def getData():
     train_dataset = train_dataset.map(load_and_preprocess_data, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     train_dataset = train_dataset.map(data_augmentation, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     train_dataset = train_dataset.shuffle(buffer_size=100).batch(BATCH_SIZE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+    train_dataset = train_dataset.repeat(2)
 
     test_dataset = tf.data.Dataset.from_tensor_slices((test_image_paths, test_label_paths))
     test_dataset = test_dataset.map(load_and_preprocess_data, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     test_dataset = test_dataset.batch(BATCH_SIZE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+    test_dataset = test_dataset.repeat(2)
 
-    # display_something(train_dataset)
+    display_something(train_dataset)
     return train_dataset, test_dataset
+
+getData()

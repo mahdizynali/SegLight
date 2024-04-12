@@ -9,8 +9,19 @@ from data_provider import getData
 model = Network()
 # model = net.call(tf.zeros((1, INPUT_HEIGHT, INPUT_WIDTH, 3)))
 
+
+def dice_loss(y_true, y_pred):
+    smooth = 1e-6  # Small value to avoid division by zero
+    y_true_f = tf.keras.backend.flatten(y_true)
+    y_pred_f = tf.keras.backend.flatten(y_pred)
+    intersection = tf.reduce_sum(y_true_f * y_pred_f)
+    dice = (2.0 * intersection + smooth) / (tf.reduce_sum(y_true_f) + tf.reduce_sum(y_pred_f) + smooth)
+    return 1 - dice
+
+
 # loss_function = SparseCategoricalCrossentropy(from_logits=False)
-loss_function = CategoricalCrossentropy(from_logits=False)
+# loss_function = CategoricalCrossentropy(from_logits=False)
+loss_function = dice_loss
 optimizer = Adam(learning_rate=LEARNING_RATE)
 mean_iou = MeanIoU(num_classes=NUMBER_OF_CLASSES)
 mean_loss = Mean()
