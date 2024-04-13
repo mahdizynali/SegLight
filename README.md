@@ -8,3 +8,5 @@ datase/
   |_ /labels/
   |_ classes.json (if you want !)
 ```
+![alt text](https://raw.githubusercontent.com/mahdizynali/SegLight/main/dataset/images/new_46.png)
+![alt text](https://github.com/mahdizynali/SegLight/blob/main/dataset/labels/new_46.png)
