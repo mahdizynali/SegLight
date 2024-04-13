@@ -16,3 +16,4 @@ Then you have to set your configuration in config file and intiate your semantic
 train_dataset = train_dataset.repeat(60)
 repeat dataset 60 times !!
 ```
+Finally try to run main.py as trainer file to store trained model into that specific folder which you set in main.py.
