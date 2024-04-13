@@ -12,7 +12,14 @@ def convert_rgb_to_class(rgb_label):
         class_idx = list(COLOR_MAP.keys()).index(class_name)
         mask = tf.reduce_all(tf.equal(rgb_label, color), axis=-1)
         int_label = tf.where(mask, class_idx, int_label)
+    
     return int_label
+
+# ball, Class number: 0
+# field, Class number: 1
+# line, Class number: 2
+# background, Class number: 3
+
 
 def _one_hot_encode(x: tf.Tensor, y: tf.Tensor) -> tf.Tensor:
 
@@ -71,8 +78,15 @@ def data_augmentation(image, label):
     image = tf.image.random_contrast(image, lower=0.7, upper=1.3)
     return image, label
 
-color_lookup_bgr = np.zeros((len(COLOR_MAP), 3), dtype=np.uint8)
-for idx, (class_name, color) in enumerate(COLOR_MAP.items()):
+COLOR_MAP2 = {
+    0: (0, 0, 255),    # Ball: Blue (BGR format)
+    1: (0, 255, 0),    # Field: Green (BGR format)
+    2: (255, 255, 255),    # Line: White (BGR format)
+    3: (0, 0, 0) # Background: Black (BGR format)
+}
+
+color_lookup_bgr = np.zeros((len(COLOR_MAP2), 3), dtype=np.uint8)
+for idx, (class_name, color) in enumerate(COLOR_MAP2.items()):
     # Convert RGB color to BGR for OpenCV
     color_bgr = [color[2], color[1], color[0]]
     color_lookup_bgr[idx] = np.array(color_bgr, dtype=np.uint8)
@@ -104,19 +118,21 @@ def display_something(dataset, num_samples=5):
 
 def getData():
     train_image_paths, test_image_paths, train_label_paths, test_label_paths = train_test_split(
-        image_paths, label_paths, test_size=0.15, random_state=42
+        image_paths, label_paths, test_size=0.15, random_state=40
     )
     
     train_dataset = tf.data.Dataset.from_tensor_slices((train_image_paths, train_label_paths))
     train_dataset = train_dataset.map(load_and_preprocess_data, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     train_dataset = train_dataset.map(data_augmentation, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     train_dataset = train_dataset.shuffle(buffer_size=100).batch(BATCH_SIZE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-    train_dataset = train_dataset.repeat(2)
+    train_dataset = train_dataset.repeat(20)
 
     test_dataset = tf.data.Dataset.from_tensor_slices((test_image_paths, test_label_paths))
     test_dataset = test_dataset.map(load_and_preprocess_data, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     test_dataset = test_dataset.batch(BATCH_SIZE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-    test_dataset = test_dataset.repeat(2)
+    test_dataset = test_dataset.repeat(20)
 
-    # display_something(train_dataset)
+    display_something(train_dataset)
     return train_dataset, test_dataset
+
+# getData()
