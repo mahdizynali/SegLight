@@ -24,9 +24,9 @@ INPUT_HEIGHT = 240
 OUTPUT_WIDTH = 320
 OUTPUT_HEIGHT = 240
 
-NUMBER_OF_CLASSES = 4
+NUMBER_OF_CLASSES = 3
 BATCH_SIZE = 64
-EPOCH_NUMBER = 10
+EPOCH_NUMBER = 200
 LEARNING_RATE = 0.001
 
 # read datasheet
@@ -34,20 +34,18 @@ with open(BASE_DIR + "/dataset/label_classes.json", "r") as js:
     file = json.load(js)
     js.close()
 
-# import color map
-COLOR_MAP = {}
-for item in file:
-    name = item["name"]
-    color = item["png_index"]
-    COLOR_MAP[name] = color
+# # import color map
+# COLOR_MAP = {}
+# for item in file:
+#     name = item["name"]
+#     color = item["png_index"]
+#     COLOR_MAP[name] = color
 
-# COLOR_MAP = {
-#     'background': [np.array([0.0, 0.0, 0.0], dtype=np.float32),],
-#     'field': [np.array([0.0, 255.0, 0.0], dtype=np.float32),],
-#     'line': [np.array([255.0, 255.0, 255.0], dtype=np.float32),],
-#     'ball':[np.array([0.0, 0.0, 255.0], dtype=np.float32),],
-# }
-
-MAX_MODELS_TO_KEEP = 5
+# i have consider ball and line as one class
+COLOR_MAP = { #bgr
+    'background': [0.0, 0.0, 0.0],
+    'field': [0.0, 255.0, 0.0],
+    'line': [255.0, 255.0, 255.0]
+}
 
 DEBUG_ENABLED = False
