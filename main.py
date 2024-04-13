@@ -137,7 +137,7 @@ def evaluate_one_epoch(data):
 if __name__ == '__main__':
     
     train_set, test_set = getData()
-    visualizer_callback = DataVisualizer(train_set, num_samples=5)
+    # visualizer_callback = DataVisualizer(train_set, num_samples=5)
 
     for epoch in range(EPOCH_NUMBER):
 
@@ -151,10 +151,10 @@ if __name__ == '__main__':
 
 
         if (epoch + 1) % 10 == 0:
-            model.save(f"./model/epoch-{str(epoch+1)}", save_format='tf')
+            model.save(f"./model/2-epoch-{str(epoch+1)}", save_format='tf')
     print("\nNew Model has been save !\n")
 
-    # loaded_model = tf.keras.models.load_model("./model/epoch-200")
+    # loaded_model = tf.keras.models.load_model("./model/2-epoch-50")
 
     # inference_on_image(loaded_model, test_set, num_samples=5)
     # real_time_inference(loaded_model)
