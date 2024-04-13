@@ -2,6 +2,55 @@ from config import *
 from inference import *
 from network import MazeNet
 from data_provider import getData
+from tensorflow.keras.callbacks import Callback
+
+class DataVisualizer(Callback):
+    def __init__(self, dataset, num_samples=5):
+        super().__init__()
+        self.dataset = dataset
+        self.num_samples = num_samples
+
+        COLOR_MAP2 = {
+            0: (0, 0, 255),    # Ball: Blue (BGR format)
+            1: (0, 255, 0),    # Field: Green (BGR format)
+            2: (255, 255, 255),    # Line: White (BGR format)
+            3: (0, 0, 0) # Background: Black (BGR format)
+        }
+
+        self.color_lookup_bgr = np.zeros((len(COLOR_MAP2), 3), dtype=np.uint8)
+        for idx, (class_name, color) in enumerate(COLOR_MAP2.items()):
+            color_bgr = [color[2], color[1], color[0]]
+            self.color_lookup_bgr[idx] = np.array(color_bgr, dtype=np.uint8)
+
+
+    def on_epoch_begin(self, epoch, logs=None):
+        print(f"Epoch {epoch + 1}: Visualizing input data")
+        self.visualize_data(self.dataset)
+
+    def visualize_data(self, dataset):
+        for i, (images, labels) in enumerate(dataset.take(self.num_samples)):
+            image = images[0].numpy()
+            label = labels[0].numpy()
+
+            if label.ndim > 2:
+                label_indices = np.argmax(label, axis=-1)
+            else:
+                label_indices = label
+
+            colored_label = self.color_lookup_bgr[label_indices]
+            
+            image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            
+            cv2.imshow(f'Epoch Image {i + 1}', image_rgb)
+            cv2.imshow(f'Epoch Label {i + 1}', colored_label)
+            
+            cv2.waitKey(0)
+            
+            cv2.destroyAllWindows()
+
+            if i + 1 >= self.num_samples:
+                break
+
 
 model = MazeNet()
 
@@ -88,13 +137,14 @@ def evaluate_one_epoch(data):
 if __name__ == '__main__':
     
     train_set, test_set = getData()
+    visualizer_callback = DataVisualizer(train_set, num_samples=5)
 
     for epoch in range(EPOCH_NUMBER):
 
         train_loss, train_iou = train_one_epoch(train_set)
         print(f'Epoch {epoch + 1}/{EPOCH_NUMBER}')
         print(f'Training loss: {train_loss:.4f}, Training mean IoU: {train_iou:.4f}')
-
+        # visualizer_callback.on_epoch_begin(epoch)
         eval_loss, eval_iou = evaluate_one_epoch(test_set)
         print(f'Evaluation loss: {eval_loss:.4f}, Evaluation mean IoU: {eval_iou:.4f}')
         print("\n==================================================================\n")
@@ -102,9 +152,9 @@ if __name__ == '__main__':
 
         if (epoch + 1) % 10 == 0:
             model.save(f"./model/epoch-{str(epoch+1)}", save_format='tf')
-        print("\nNew Model has been save !\n")
+    print("\nNew Model has been save !\n")
 
-    # loaded_model = tf.keras.models.load_model("./model")
+    # loaded_model = tf.keras.models.load_model("./model/epoch-200")
 
     # inference_on_image(loaded_model, test_set, num_samples=5)
     # real_time_inference(loaded_model)

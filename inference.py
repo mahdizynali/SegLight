@@ -30,22 +30,23 @@ def inference_on_image(model, test_dataset, num_samples=10):
         
         cv2.destroyAllWindows()
 
-COLOR_MAP2 = {
-    0: (0, 0, 255),    # Ball: Blue (BGR format)
-    1: (0, 255, 0),    # Field: Green (BGR format)
-    2: (255, 255, 255),    # Line: White (BGR format)
-    3: (0, 0, 0) # Background: Black (BGR format)
-}
-
 def real_time_inference(model):
 
-    photo = cv2.imread("/home/mahdi/Desktop/hslSegment/SegLight/dataset/images/53.png")
+    photo = cv2.imread("/home/mahdi/Desktop/hslSegment/SegLight/dataset/images/262.png")
+    lb = cv2.imread("/home/mahdi/Desktop/hslSegment/SegLight/dataset/labels/262.png")
 
     cap = cv2.VideoCapture(0) 
-    
+
+    COLOR_MAP2 = {
+        0: (0, 0, 255),    # Ball: Blue (BGR format)
+        1: (0, 255, 0),    # Field: Green (BGR format)
+        2: (255, 255, 255),    # Line: White (BGR format)
+        3: (0, 0, 0) # Background: Black (BGR format)
+    }
+
     color_lookup_bgr = np.zeros((len(COLOR_MAP2), 3), dtype=np.uint8)
     for idx, (class_name, color) in enumerate(COLOR_MAP2.items()):
-
+        # Convert RGB color to BGR for OpenCV
         color_bgr = [color[2], color[1], color[0]]
         color_lookup_bgr[idx] = np.array(color_bgr, dtype=np.uint8)
     
@@ -77,6 +78,7 @@ def real_time_inference(model):
         
         cv2.imshow('real', frame)
         cv2.imshow('pred', predicted_colored)
+        cv2.imshow('true', lb)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
