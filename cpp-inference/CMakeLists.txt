@@ -9,18 +9,17 @@ find_package(cppflow REQUIRED)
 find_package(OpenCV REQUIRED)
 
 target_include_directories(
-    example PUBLIC
+    test PUBLIC
     cppflow::cppflow
 )
 
-# Link libraries
 target_link_libraries(
-    example PUBLIC
+    test PUBLIC
     cppflow::cppflow
     ${OpenCV_LIBRARIES}
 )
 
 target_include_directories(
-    example PUBLIC
+    test PUBLIC
     ${OpenCV_INCLUDE_DIRS}
 )

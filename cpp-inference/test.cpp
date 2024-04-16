@@ -5,6 +5,8 @@
 #include <cppflow/cppflow.h>
 #include <opencv2/opencv.hpp>
 
+cv::TickMeter timer;
+
 int main() {
     std::map<int, std::array<uint8_t, 3>> COLOR_MAP = {
         {0, {0, 0, 0}},   // Black
@@ -25,7 +27,10 @@ int main() {
     input = cppflow::expand_dims(input, 0);
     input = input / 255.f;
 
+    timer.start();
     cppflow::tensor output = model(input);
+    timer.stop();
+    std::cout << "Inference time, ms: " << timer.getTimeMilli()  << std::endl;
 
     cppflow::tensor pred = cppflow::arg_max(output, 3);
 
