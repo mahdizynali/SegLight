@@ -6,6 +6,7 @@
 #include <opencv2/opencv.hpp>
 
 cv::TickMeter timer;
+cppflow::model *SegLight;
 
 int main() {
     std::map<int, std::array<uint8_t, 3>> COLOR_MAP = {
@@ -19,7 +20,8 @@ int main() {
         color_lookup_bgr.push_back(cv::Vec3b(color[0], color[1], color[2]));
     }
 
-    cppflow::model model("/home/mahdi/Desktop/hslSegment/SegLight/test/model");
+    // cppflow::model SegLight("/home/mahdi/Desktop/hslSegment/SegLight/test/model");
+    SegLight = new cppflow::model("/home/mahdi/Desktop/hslSegment/SegLight/test/model");
 
     cppflow::tensor input = cppflow::decode_png(cppflow::read_file(std::string("/home/mahdi/Desktop/hslSegment/SegLight/test/9.png")));
 
@@ -28,7 +30,7 @@ int main() {
     input = input / 255.f;
 
     timer.start();
-    cppflow::tensor output = model(input);
+    cppflow::tensor output = (*SegLight)(input);
     timer.stop();
     std::cout << "Inference time, ms: " << timer.getTimeMilli()  << std::endl;
 
