@@ -30,9 +30,9 @@ EPOCH_NUMBER = 200
 LEARNING_RATE = 0.001
 
 # read datasheet
-with open(BASE_DIR + "/dataset/label_classes.json", "r") as js:
-    file = json.load(js)
-    js.close()
+# with open(BASE_DIR + "/dataset/label_classes.json", "r") as js:
+#     file = json.load(js)
+#     js.close()
 
 # # import color map
 # COLOR_MAP = {}
