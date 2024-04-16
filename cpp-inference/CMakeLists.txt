@@ -1,0 +1,26 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(inference)
+
+add_executable(test test.cpp)
+
+find_package(cppflow REQUIRED)
+
+find_package(OpenCV REQUIRED)
+
+target_include_directories(
+    example PUBLIC
+    cppflow::cppflow
+)
+
+# Link libraries
+target_link_libraries(
+    example PUBLIC
+    cppflow::cppflow
+    ${OpenCV_LIBRARIES}
+)
+
+target_include_directories(
+    example PUBLIC
+    ${OpenCV_INCLUDE_DIRS}
+)
