@@ -17,3 +17,12 @@ train_dataset = train_dataset.repeat(60)
 repeat dataset 60 times !!
 ```
 Finally try to run main.py as trainer file to store trained model into that specific folder which you set in main.py.
+
+```
+@software{Mahdi_SegLight_Light_Semantic,
+  author = {Mahdi, Zeinali},
+  title = {{SegLight (Light Semantic Segmentation For Humanoid Soccer Robots)}},
+  url = {https://github.com/mahdizynali/SegLight},
+  version = {1.0}
+}
+```
