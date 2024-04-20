@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(inference)
 
-add_executable(test test.cpp)
+add_executable(test main.cpp inferencer.hpp)
 
 find_package(cppflow REQUIRED)
 
