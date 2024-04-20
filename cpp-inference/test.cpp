@@ -6,7 +6,12 @@
 #include <opencv2/opencv.hpp>
 
 cv::TickMeter timer;
+cv::TickMeter timer2;
 cppflow::model *SegLight;
+cppflow::model *SegLight2;
+
+int height = 240;
+int width = 320;
 
 int main() {
     std::map<int, std::array<uint8_t, 3>> COLOR_MAP = {
@@ -20,24 +25,69 @@ int main() {
         color_lookup_bgr.push_back(cv::Vec3b(color[0], color[1], color[2]));
     }
 
-    // cppflow::model SegLight("/home/mahdi/Desktop/hslSegment/SegLight/test/model");
-    SegLight = new cppflow::model("/home/mahdi/Desktop/hslSegment/SegLight/test/model");
+    SegLight = new cppflow::model("../model/khatibi");
+    SegLight2 = new cppflow::model("../model/zeinali");
 
-    cppflow::tensor input = cppflow::decode_png(cppflow::read_file(std::string("/home/mahdi/Desktop/hslSegment/SegLight/test/9.png")));
+
+    cv::Mat frame = cv::imread("../../dataset/images/9.png");
+    std::vector<unsigned char> img_vec(frame.data, frame.data + width * height * 3);
+    cppflow::tensor input(img_vec, {height, width, 3});
+
+    cppflow::tensor input2 = cppflow::decode_png(cppflow::read_file(std::string("../../dataset/images/9.png")));
 
     input = cppflow::cast(input, TF_UINT8, TF_FLOAT);
     input = cppflow::expand_dims(input, 0);
-    input = input / 255.f;
+    // input = input / 255.f;
 
-    timer.start();
-    cppflow::tensor output = (*SegLight)(input);
-    timer.stop();
-    std::cout << "Inference time, ms: " << timer.getTimeMilli()  << std::endl;
+    input2 = cppflow::cast(input2, TF_UINT8, TF_FLOAT);
+    input2 = cppflow::expand_dims(input2, 0);
+    input2 = input2 / 255.f;
 
-    cppflow::tensor pred = cppflow::arg_max(output, 3);
 
-    int height = 240;
-    int width = 320;
+
+    // average all timer and timer2 times
+    int num_iterations = 100; // Configurable number of iterations
+
+    double total_time_khatibi = 0.0;
+    double total_time_zeinali = 0.0;
+
+    // Just call the model to load it into memory
+    auto output = (*SegLight)({{"input:0", input}}, {"predictor/predictions_argmax:0"});
+    cppflow::tensor output2 = (*SegLight2)(input2);
+
+    for (int i = 0; i < num_iterations; i++) {
+        cv::TickMeter timer;
+        cv::TickMeter timer2;
+        timer.start();
+        auto output = (*SegLight)({{"input:0", input}}, {"predictor/predictions_argmax:0"});
+        timer.stop();
+        std::cout << "Inference time khatibi, ms: " << timer.getTimeMilli()  << std::endl;
+        total_time_khatibi += timer.getTimeMilli();
+
+        timer2.start();
+        cppflow::tensor output2 = (*SegLight2)(input2);
+        timer2.stop();
+        std::cout << "Inference time zeinali, ms: " << timer2.getTimeMilli()  << std::endl;
+        total_time_zeinali += timer2.getTimeMilli();
+    }
+
+    double average_time_khatibi = total_time_khatibi / num_iterations;
+    double average_time_zeinali = total_time_zeinali / num_iterations;
+
+    std::cout << "Average inference time khatibi, ms: " << average_time_khatibi << std::endl;
+    std::cout << "Average inference time zeinali, ms: " << average_time_zeinali << std::endl;
+
+    // timer.start();
+    // auto output = (*SegLight)({{"input:0", input}}, {"predictor/predictions_argmax:0"});
+    // timer.stop();
+    // std::cout << "Inference time khatibi, ms: " << timer.getTimeMilli()  << std::endl;
+
+    // timer2.start();
+    // cppflow::tensor output2 = (*SegLight2)(input2);
+    // timer2.stop();
+    // std::cout << "Inference time zeinali, ms: " << timer2.getTimeMilli()  << std::endl;
+
+    cppflow::tensor pred = cppflow::arg_max(output2, 3);
 
     cv::Mat colorized_output(height, width, CV_8UC3);
 
