@@ -31,7 +31,7 @@ public:
         // average all timer and timer times
         int num_iterations = 100; // Configurable number of iterations
 
-        double total_time_zeinali = 0.0;
+        double total_time = 0.0;
 
         // Just call the model to load it into memory
         result = (*SegLight)(input);
@@ -43,10 +43,10 @@ public:
             result = (*SegLight)(input);
             timer.stop();
             std::cout << "Inference time zeinali, ms: " << timer.getTimeMilli()  << std::endl;
-            total_time_zeinali += timer.getTimeMilli();
+            total_time += timer.getTimeMilli();
         }
 
-        double average_time_zeinali = total_time_zeinali / num_iterations;
+        double average_time_zeinali = total_time / num_iterations;
 
         std::cout << "Average inference time zeinali, ms: " << average_time_zeinali << std::endl;
 
