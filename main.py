@@ -67,8 +67,17 @@ def dice_loss(y_true, y_pred):
 loss_function = CategoricalCrossentropy(from_logits=False)
 
 optimizer = Adam(learning_rate=LEARNING_RATE)
-mean_iou = MeanIoU(num_classes=NUMBER_OF_CLASSES)
-mean_loss = Mean()
+# mean_loss = Mean()
+
+train_mean_iou = MeanIoU(num_classes=NUMBER_OF_CLASSES)
+test_mean_iou = MeanIoU(num_classes=NUMBER_OF_CLASSES)
+
+train_loss = tf.keras.metrics.Mean(name='train_loss')
+train_accuracy = tf.keras.metrics.CategoricalAccuracy(name='train_accuracy')
+
+test_loss = tf.keras.metrics.Mean(name='test_loss')
+test_accuracy = tf.keras.metrics.CategoricalAccuracy(name='test_accuracy')
+
 
 # writer = tf.summary.create_file_writer('logs/graphs')
 # writer.set_as_default()
@@ -84,55 +93,49 @@ mean_loss = Mean()
 # tf.profiler.experimental.start(logdir='logs/graphs')
 # tf.profiler.experimental.stop()
 
+@tf.function
+def train_one_epoch(images, labels):
 
-def train_one_epoch(data):
+    # pbar = tqdm(data, desc="Training", unit="batch")
 
-    mean_loss.reset_state()
-    mean_iou.reset_state()
+    # for images, labels in pbar:
+    with tf.GradientTape() as tape:
 
-    pbar = tqdm(data, desc="Training", unit="batch")
-
-    for images, labels in pbar:
-        with tf.GradientTape() as tape:
-
-            predictions = model.call(images, training=True)
-
-            loss = loss_function(labels, predictions)
-
-        gradients = tape.gradient(loss, model.trainable_variables)
-
-        optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-
-        predictions_argmax = tf.argmax(predictions, axis=-1)
-
-        labels_reshaped = tf.argmax(labels, axis=-1)
-
-        mean_loss.update_state(loss)
-        mean_iou.update_state(labels_reshaped, predictions_argmax)
-
-    return mean_loss.result(), mean_iou.result()
-
-
-def evaluate_one_epoch(data):
-
-    mean_loss.reset_state()
-    mean_iou.reset_state()
-
-    pbar = tqdm(data, desc="Evaluation", unit="batch")
-    for images, labels in pbar:
-
-        predictions = model(images)
+        predictions = model.call(images, training=True)
 
         loss = loss_function(labels, predictions)
+    gradients = tape.gradient(loss, model.trainable_variables)
 
-        predictions_argmax = tf.argmax(predictions, axis=-1)
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
-        labels_reshaped = tf.argmax(labels, axis=-1)
+    predictions_argmax = tf.argmax(predictions, axis=-1)
 
-        mean_loss.update_state(loss)
-        mean_iou.update_state(labels_reshaped, predictions_argmax)
+    labels_reshaped = tf.argmax(labels, axis=-1)
 
-    return mean_loss.result(), mean_iou.result()
+    # mean_loss.update_state(loss)
+    train_mean_iou.update_state(labels_reshaped, predictions_argmax)
+    train_loss(loss)
+    train_accuracy(labels, predictions)
+
+@tf.function
+def evaluate_one_epoch(images, labels):
+
+    # pbar = tqdm(data, desc="Evaluation", unit="batch")
+    # for images, labels in pbar:
+
+    predictions = model(images)
+
+    loss = loss_function(labels, predictions)
+
+    predictions_argmax = tf.argmax(predictions, axis=-1)
+
+    labels_reshaped = tf.argmax(labels, axis=-1)
+
+    # mean_loss.update_state(loss)
+    test_mean_iou.update_state(labels_reshaped, predictions_argmax)
+
+    test_loss(loss)
+    test_accuracy(labels, predictions)
 
 if __name__ == '__main__':
     
@@ -141,19 +144,29 @@ if __name__ == '__main__':
 
     for epoch in range(EPOCH_NUMBER):
 
-        train_loss, train_iou = train_one_epoch(train_set)
+        train_loss.reset_state()
+        train_accuracy.reset_state()
+        train_mean_iou.reset_state()
+
+        test_loss.reset_state()
+        test_accuracy.reset_state()
+        test_mean_iou.reset_state()
+
+
+        for images, labels in train_set:
+            train_one_epoch(images, labels)
         print(f'Epoch {epoch + 1}/{EPOCH_NUMBER}')
-        print(f'Training loss: {train_loss:.4f}, Training mean IoU: {train_iou:.4f}')
+        print(f'Training loss: {train_loss.result():.4f}, Accuracy: {train_accuracy.result():.4f}, mean IoU: {train_mean_iou.result():.4f}')
+
         # visualizer_callback.on_epoch_begin(epoch)
-        eval_loss, eval_iou = evaluate_one_epoch(test_set)
-        print(f'Evaluation loss: {eval_loss:.4f}, Evaluation mean IoU: {eval_iou:.4f}')
+        for images, labels in test_set:
+            evaluate_one_epoch(images, labels)
+        print(f'Evaluation loss: {test_loss.result():.4f}, Accuracy: {test_accuracy.result():.4f}, Evaluation mean IoU: {test_mean_iou.result():.4f}')
         print("\n==================================================================\n")
 
 
-        if (epoch + 1) % 10 == 0:
-            model.save(f"./model/new/epoch-{str(epoch+1)}", save_format='tf') # for keras v2
-            # model.save(f"./model/new/epoch-{str(epoch+1)}.h5") # or may .keras for keras v3
-            
+        if (epoch + 1) % 20 == 0:
+            model.save(f"./model/new/epoch-{str(epoch+1)}", save_format='tf')
     print("\nNew Model has been save !\n")
 
     # loaded_model = tf.keras.models.load_model("./model/2-epoch-50")
