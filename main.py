@@ -87,8 +87,8 @@ mean_loss = Mean()
 
 def train_one_epoch(data):
 
-    mean_loss.reset_states()
-    mean_iou.reset_states()
+    mean_loss.reset_state()
+    mean_iou.reset_state()
 
     pbar = tqdm(data, desc="Training", unit="batch")
 
@@ -115,8 +115,8 @@ def train_one_epoch(data):
 
 def evaluate_one_epoch(data):
 
-    mean_loss.reset_states()
-    mean_iou.reset_states()
+    mean_loss.reset_state()
+    mean_iou.reset_state()
 
     pbar = tqdm(data, desc="Evaluation", unit="batch")
     for images, labels in pbar:
@@ -151,7 +151,7 @@ if __name__ == '__main__':
 
 
         if (epoch + 1) % 10 == 0:
-            model.save(f"./model/2-epoch-{str(epoch+1)}", save_format='tf')
+            model.save(f"./model/epoch-{str(epoch+1)}", save_format='tf')
     print("\nNew Model has been save !\n")
 
     # loaded_model = tf.keras.models.load_model("./model/2-epoch-50")
