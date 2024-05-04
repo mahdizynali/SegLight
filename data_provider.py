@@ -93,8 +93,6 @@ def data_augmentation(image, label):
         image = tf.image.flip_up_down(image)
         label = tf.image.flip_up_down(label)
 
-    image = tf.image.random_brightness(image, 0.05)
-    image = tf.image.random_contrast(image, 0.7, 1.7)
     image = tf.clip_by_value(image, 0, 255)
     image = tf.image.random_saturation(image, lower=0.8, upper=1.2)
     image = tf.image.random_brightness(image, max_delta=0.05)
@@ -134,19 +132,19 @@ def display_something(dataset, num_samples=5):
 
 def getData():
     train_image_paths, test_image_paths, train_label_paths, test_label_paths = train_test_split(
-        image_paths, label_paths, test_size=0.15, random_state=40
+        image_paths, label_paths, test_size=0.15, random_state=42
     )
     
     train_dataset = tf.data.Dataset.from_tensor_slices((train_image_paths, train_label_paths))
     train_dataset = train_dataset.map(load_and_preprocess_data, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     train_dataset = train_dataset.map(data_augmentation, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     train_dataset = train_dataset.shuffle(buffer_size=100).batch(BATCH_SIZE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-    train_dataset = train_dataset.repeat(50)
+    train_dataset = train_dataset.repeat(2)
 
     test_dataset = tf.data.Dataset.from_tensor_slices((test_image_paths, test_label_paths))
     test_dataset = test_dataset.map(load_and_preprocess_data, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     test_dataset = test_dataset.batch(BATCH_SIZE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-    test_dataset = test_dataset.repeat(50)
+    test_dataset = test_dataset.repeat(2)
 
     # display_something(train_dataset)
     return train_dataset, test_dataset
