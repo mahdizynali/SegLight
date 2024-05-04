@@ -151,7 +151,9 @@ if __name__ == '__main__':
 
 
         if (epoch + 1) % 10 == 0:
-            model.save(f"./model/epoch-{str(epoch+1)}", save_format='tf')
+            model.save(f"./model/new/epoch-{str(epoch+1)}", save_format='tf') # for keras v2
+            # model.save(f"./model/new/epoch-{str(epoch+1)}.h5") # or may .keras for keras v3
+            
     print("\nNew Model has been save !\n")
 
     # loaded_model = tf.keras.models.load_model("./model/2-epoch-50")
