@@ -47,5 +47,3 @@ COLOR_MAP = { #bgr
     'field': [0.0, 255.0, 0.0],
     'line': [255.0, 255.0, 255.0]
 }
-
-DEBUG_ENABLED = False
