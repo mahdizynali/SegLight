@@ -1,8 +1,31 @@
 from config import *
 from sklearn.model_selection import train_test_split
 
-image_paths = glob.glob(IMAGES_PATH + '*.png')
-label_paths = [LABELS_PATH + path.split('/')[-1].split('.')[0] + '.png' for path in image_paths]
+#==========================================================================================
+
+series_dirs = [series_dir for series_dir in os.listdir(DATASET_DIR) if os.path.isdir(os.path.join(DATASET_DIR, series_dir))]
+
+image_paths = []
+label_paths = []
+
+for series_dir in series_dirs:
+    images_path = os.path.join(DATASET_DIR, series_dir, "images")
+    labels_path = os.path.join(DATASET_DIR, series_dir, "labels")
+
+    image_files = glob.glob(os.path.join(images_path, '*.png'))
+
+    image_paths.extend(image_files)
+    
+    for image_file in image_files:
+        image_name = os.path.splitext(os.path.basename(image_file))[0]
+        label_file = os.path.join(labels_path, image_name + '.png')
+        label_paths.append(label_file)
+
+print("Number of images:", len(image_paths))
+print("Number of labels:", len(label_paths))
+
+
+#==========================================================================================
 
 IMAGE_SIZE = (INPUT_HEIGHT, INPUT_WIDTH)
 

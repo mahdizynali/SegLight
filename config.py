@@ -11,10 +11,10 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import MeanIoU, Mean
 from tensorflow.keras.losses import SparseCategoricalCrossentropy, CategoricalCrossentropy
 
-BASE_DIR = os.path.dirname(__file__)
+DATASET_DIR = "dataset"
 
-IMAGES_PATH = BASE_DIR + "/dataset/images/"
-LABELS_PATH = BASE_DIR + "/dataset/labels/"
+BASE_DIR = os.path.dirname(__file__)
+DATASET_DIR = os.path.join(BASE_DIR, DATASET_DIR)
 
 # Input dimensions
 INPUT_WIDTH = 320

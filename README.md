@@ -4,9 +4,13 @@ Approch of this project is implementing light weight semantic segmentation model
 first of all you have to prepare suitable semantic dataset as images and labels files in dataset directory like bellow :
 ```
 datase/
-  |_ /images/
-  |_ /labels/
-  |_ classes.json (if you want !)
+  |_ seri1:
+    |_ /images/
+    |_ /labels/
+  |_ seri2:
+    |_ /images/
+    |_ /labels/
+  ...
 ```
 ![alt text](https://raw.githubusercontent.com/mahdizynali/SegLight/main/dataset/images/new_46.png)
 ![alt text](https://github.com/mahdizynali/SegLight/blob/main/dataset/labels/new_46.png) \
