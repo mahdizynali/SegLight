@@ -37,7 +37,7 @@ model.save("save/path", save_format='tf') # for keras v2
 model.save("model.h5") # or may .keras for keras v3
 ``` 
 Finally try to run main.py as trainer file to store trained model into that specific folder which you set in main.py.
-
+## Citation
 ```
 @software{Mahdi_SegLight_Light_Semantic,
   author = {Mahdi, Zeinali},
