@@ -21,9 +21,9 @@ train_dataset = train_dataset.repeat(60)
 repeat dataset 60 times !!
 ```
 # Save Model Hint !
-in tensorflow version 2.16.0 and above, keras kernel updates into version 3 and it limit us to save models only in .h5 or .keras format;\
+in tensorflow version 2.16.0 and above, keras kernel updates into version 3 and it limit us to save models only in .h5 or .keras format;
 so as i wanna inference on cpp and cppflow, i need to save as tf format .pb as keras v2 in order to load in cppflow inferencer.\
-try to intall also keras v2 :
+try to install also keras v2 :
 ```
 pip install tf-keras~=2.16
 ```
