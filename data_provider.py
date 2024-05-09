@@ -138,13 +138,13 @@ def getData():
     train_dataset = tf.data.Dataset.from_tensor_slices((train_image_paths, train_label_paths))
     train_dataset = train_dataset.map(load_and_preprocess_data, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     train_dataset = train_dataset.map(data_augmentation, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    train_dataset = train_dataset.shuffle(buffer_size=100).batch(BATCH_SIZE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-    train_dataset = train_dataset.repeat(2)
+    train_dataset = train_dataset.shuffle(buffer_size=64).batch(BATCH_SIZE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+    train_dataset = train_dataset.repeat(5)
 
     test_dataset = tf.data.Dataset.from_tensor_slices((test_image_paths, test_label_paths))
     test_dataset = test_dataset.map(load_and_preprocess_data, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     test_dataset = test_dataset.batch(BATCH_SIZE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-    test_dataset = test_dataset.repeat(2)
+    test_dataset = test_dataset.repeat(5)
 
     # display_something(train_dataset)
     return train_dataset, test_dataset
