@@ -11,10 +11,9 @@ class DataVisualizer(Callback):
         self.num_samples = num_samples
 
         COLOR_MAP2 = {
-            0: (0, 0, 255),    # Ball: Blue (BGR format)
+            0: (0, 0, 0) # Background: Black (BGR format)
             1: (0, 255, 0),    # Field: Green (BGR format)
             2: (255, 255, 255),    # Line: White (BGR format)
-            3: (0, 0, 0) # Background: Black (BGR format)
         }
 
         self.color_lookup_bgr = np.zeros((len(COLOR_MAP2), 3), dtype=np.uint8)
@@ -63,27 +62,11 @@ def dice_loss(y_true, y_pred):
     return 1 - dice
 # loss_function = dice_loss
 
-# loss_function = SparseCategoricalCrossentropy(from_logits=False)
 loss_function = CategoricalCrossentropy(from_logits=False)
 
 optimizer = Adam(learning_rate=LEARNING_RATE)
 mean_iou = MeanIoU(num_classes=NUMBER_OF_CLASSES)
 mean_loss = Mean()
-
-# writer = tf.summary.create_file_writer('logs/graphs')
-# writer.set_as_default()
-# tf.summary.trace_on(graph=True, profiler=True)
-
-# with writer.as_default():
-#     tf.summary.trace_export(
-#         name="model_trace",
-#         step=0,
-#         profiler_outdir='logs/graphs'
-#     )
-
-# tf.profiler.experimental.start(logdir='logs/graphs')
-# tf.profiler.experimental.stop()
-
 
 def train_one_epoch(data):
 
@@ -133,28 +116,36 @@ def evaluate_one_epoch(data):
         mean_iou.update_state(labels_reshaped, predictions_argmax)
 
     return mean_loss.result(), mean_iou.result()
+    
 
 if __name__ == '__main__':
-    
     train_set, test_set = getData()
-    # visualizer_callback = DataVisualizer(train_set, num_samples=5)
+
+    best_iou = 0.0
+    best_epoch = 0
 
     for epoch in range(EPOCH_NUMBER):
-
+        print(f'Epoch {epoch + 1}/{EPOCH_NUMBER}\n')
         train_loss, train_iou = train_one_epoch(train_set)
-        print(f'Epoch {epoch + 1}/{EPOCH_NUMBER}')
         print(f'Training loss: {train_loss:.4f}, Training mean IoU: {train_iou:.4f}')
-        # visualizer_callback.on_epoch_begin(epoch)
+
         eval_loss, eval_iou = evaluate_one_epoch(test_set)
         print(f'Evaluation loss: {eval_loss:.4f}, Evaluation mean IoU: {eval_iou:.4f}')
         print("\n==================================================================\n")
 
+        if eval_iou > best_iou:
+            best_iou = eval_iou
+            best_epoch = epoch + 1
+            model.save(os.path.join(SAVE_MODEL_DIR, f"best_model"), save_format='tf')
 
-        if (epoch + 1) % 10 == 0:
-            model.save(f"./model/new/epoch-{str(epoch+1)}", save_format='tf') # for keras v2
-            # model.save(f"./model/new/epoch-{str(epoch+1)}.h5") # or may .keras for keras v3
-            
-    print("\nNew Model has been save !\n")
+        if (epoch + 1) % 20 == 0:
+            model.save(os.path.join(SAVE_MODEL_DIR, f"model-{str(epoch+1)}-epoch"), save_format='tf')
+
+        with open(SAVE_MODEL_DIR + f"/logs.txt", "a") as f:
+            f.write(f"epoch {epoch + 1} with train_IoU: {train_iou} and train_loss {train_loss}\n")
+            f.close()
+
+    print("\nModels have been saved!")
 
     # loaded_model = tf.keras.models.load_model("./model/2-epoch-50")
 
