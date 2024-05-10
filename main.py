@@ -124,6 +124,16 @@ if __name__ == '__main__':
     best_iou = 0.0
     best_epoch = 0
 
+    #================== use pre-trained model ==================
+    # print("\nload pre-trained model\n\n")
+    # model = tf.keras.models.load_model('./models/best_model/')
+
+    # model.compile(optimizer='adam',
+    #             loss=tf.keras.losses.CategoricalCrossentropy(from_logits=False),
+    #             metrics=['accuracy'])
+    # print(model.summary())
+    #==========================================================
+    
     for epoch in range(EPOCH_NUMBER):
         print(f'Epoch {epoch + 1}/{EPOCH_NUMBER}\n')
         train_loss, train_iou = train_one_epoch(train_set)
