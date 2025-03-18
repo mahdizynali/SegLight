@@ -40,7 +40,7 @@ Finally try to run main.py as trainer file to store trained model into that spec
 ## Citation
 ```
 @software{Mahdi_SegLight_Light_Semantic,
-  author = {Mahdi, Zeinali},
+  author = {Mahdi, Zeinali},{Erfan, Ramezani},
   title = {{SegLight (Light Semantic Segmentation For Humanoid Soccer Robots)}},
   url = {https://github.com/mahdizynali/SegLight},
   version = {1.0}
