@@ -3,6 +3,8 @@ message: "I will be glad if you cite this project as below."
 authors:
 - family-names: "Mahdi"
   given-names: "Zeinali"
+- family-names: "Erfan"
+  given-names: "Ramezani"
 title: "SegLight (Light Semantic Segmentation For Humanoid Soccer Robots)"
 version: 1.0
 date-released: 04/15/2024
