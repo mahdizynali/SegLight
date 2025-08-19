@@ -46,6 +46,41 @@ Finally try to run main.py as trainer file to store trained model into that spec
 
 ---
 
+## Paper Evaluation Framework
+
+**NEW**: SegLight now includes a comprehensive evaluation framework designed for academic research and publication!
+
+### 🔬 Research Features
+- **Comprehensive Evaluation**: Segmentation metrics, performance benchmarking, statistical analysis
+- **Model Comparison**: Multi-model statistical comparison with significance testing
+- **Publication Ready**: Automated generation of plots, tables, and reports for academic papers
+- **Statistical Rigor**: Built-in statistical tests, effect size calculation, confidence intervals
+
+### Quick Start with Paper Framework
+```bash
+# Run framework demo
+python simple_demo.py
+
+# Evaluate models for paper
+python paper/main_paper.py --models MazeNet --output results/
+
+# See example usage
+python example_usage.py
+```
+
+### Framework Structure
+```
+paper/
+├── utils/           # Model management and loading
+├── evaluation/      # Comprehensive metrics calculation  
+├── benchmarks/      # Performance testing and profiling
+├── visualization/   # Publication-ready plots and figures
+├── statistics/      # Statistical analysis and testing
+└── main_paper.py    # Complete evaluation pipeline
+```
+
+See `paper/README.md` for detailed documentation.
+
 ## Citation
 ```
 @software{Mahdi_SegLight_Light_Semantic,
