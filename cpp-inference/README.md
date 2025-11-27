@@ -1,5 +1,5 @@
 ## Inference On C++
-First install tensorflow c_lang for cpu which size is 116MB :
+First install tensorflow c_lang for cpu which size is 121MB :
 ```
 https://www.tensorflow.org/install/lang_c
 ```
